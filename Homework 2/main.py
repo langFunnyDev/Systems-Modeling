@@ -23,7 +23,7 @@ class MainWindow(QtWidgets.QMainWindow):
         styles = {'color': 'k', 'font-size': '20px'}
         self.graphWidget.setLabel('left', 'Q(x)', **styles)
         self.graphWidget.setLabel('bottom', 'x', **styles)
-        self.graphWidget.setTitle("Метод Монте-Карло", color="k", size="20pt")
+        self.graphWidget.setTitle("Теоретический метод определения ожидаемого Q(x)", color="k", size="20pt")
         self.graphWidget.addLegend(offset=(120, 70))
         # self.graphWidget.setBackground("w")
 
@@ -38,23 +38,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.label_B = QtWidgets.QLabel("B:")
         self.label_alpha = QtWidgets.QLabel("\u03B1:")
         self.label_beta = QtWidgets.QLabel("\u03B2:")
-        self.label_n = QtWidgets.QLabel("n:")
-        self.label_m = QtWidgets.QLabel("m:")
 
         # line edits
         self.line_edit_A = QtWidgets.QLineEdit("0")
         self.line_edit_B = QtWidgets.QLineEdit("1")
         self.line_edit_alpha = QtWidgets.QLineEdit("1")
         self.line_edit_beta = QtWidgets.QLineEdit("1")
-        self.line_edit_n = QtWidgets.QLineEdit("100000")
-        self.line_edit_m = QtWidgets.QLineEdit("20")
 
         self.line_edit_A.setFixedWidth(150)
         self.line_edit_B.setFixedWidth(150)
         self.line_edit_alpha.setFixedWidth(150)
         self.line_edit_beta.setFixedWidth(150)
-        self.line_edit_n.setFixedWidth(150)
-        self.line_edit_m.setFixedWidth(150)
 
         # buttons
         self.button = QtWidgets.QPushButton("Построить")
@@ -65,15 +59,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.layout.addWidget(self.label_B, 1, 0)
         self.layout.addWidget(self.label_alpha, 2, 0)
         self.layout.addWidget(self.label_beta, 3, 0)
-        self.layout.addWidget(self.label_n, 4, 0)
-        self.layout.addWidget(self.label_m, 5, 0)
 
         self.layout.addWidget(self.line_edit_A, 0, 1)
         self.layout.addWidget(self.line_edit_B, 1, 1)
         self.layout.addWidget(self.line_edit_alpha, 2, 1)
         self.layout.addWidget(self.line_edit_beta, 3, 1)
-        self.layout.addWidget(self.line_edit_n, 4, 1)
-        self.layout.addWidget(self.line_edit_m, 5, 1)
 
         self.layout.addWidget(self.button, 6, 0, 1, 2)
 
@@ -88,11 +78,10 @@ class MainWindow(QtWidgets.QMainWindow):
         b = float(self.line_edit_B.text())
         alpha = float(self.line_edit_alpha.text())
         beta = float(self.line_edit_beta.text())
-        n = int(self.line_edit_n.text())
-        m = int(self.line_edit_m.text())
+        n = 100000
 
         # theoretic
-        bins = np.linspace(a, b, m)
+        bins = np.linspace(a, b, 20)
         q = [self.calculate_theoretic(a, b, x, alpha, beta) for x in bins]
 
         # optimal
@@ -124,11 +113,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # drawing
         self.graphWidget.plot(bins, q, pen=self.pen_theoretic, clear=True,
                               name="Теоретический расчет ожидаемого Q(x)")
-        self.graphWidget.plot(bins, q_monte_carlo, pen=None, symbol="o", symbolBrush=self.brush_monte_carlo,
-                              name="Метод Монте-Карло")
         self.graphWidget.plot([x_min], [q_min], pen=None, symbol="o", symbolBrush=self.brush_optimal,
                               name=f"Оптимальное значение({x_min:.3f}, {q_min:.3f})")
-        self.graphWidget.plot(bins, q_deviation, pen=self.pen_deviation, name="Стандартное отклонение")
 
     @staticmethod
     def calculate_theoretic(a, b, x, alpha, beta):
